@@ -20,12 +20,22 @@
       rec {
         packages = {
           myapp = mkPoetryApplication { projectDir = ./.; };
-          myenv = mkPoetryEnv { projectDir = ./.; };
+          myenv = mkPoetryEnv {
+            projectDir = ./.;
+            editablePackageSources = {
+              my-hello = ./.;
+            };
+          };
           default = self.packages.${system}.myapp;
         };
 
         devShells.default = shell {
           packages = [ poetry2nix.packages.${system}.poetry packages.myapp ];
+        };
+
+        devShells.myenv = shell {
+          packages = [ packages.myenv ];
+          shellHook = ''echo "${packages.myenv}"'';
         };
       });
 }
